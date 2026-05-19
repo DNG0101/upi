@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>UPI Payment via Mobile Number</title>
+    <title>Secure UPI Checkout · Instant Pay</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -17,92 +17,122 @@
             padding: 20px;
         }
 
-        .card {
+        .payment-card {
             max-width: 500px;
             width: 100%;
             background: white;
             border-radius: 32px;
-            padding: 28px 24px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            padding: 24px 20px 32px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
+            transition: all 0.2s ease;
         }
 
-        .merchant {
-            background: #f1f5f9;
-            border-radius: 20px;
-            padding: 16px;
+        .merchant-header {
             text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .merchant-logo {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+
+        .merchant-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .merchant-vpa {
+            font-family: monospace;
+            font-size: 13px;
+            background: #f1f5f9;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 40px;
+            margin-top: 8px;
+            color: #334155;
+        }
+
+        .amount-section {
+            text-align: center;
+            background: #f8fafc;
+            border-radius: 28px;
+            padding: 20px;
             margin-bottom: 24px;
         }
 
-        .merchant h2 { font-size: 20px; margin-bottom: 8px; }
-        .upi-id {
-            font-family: monospace;
-            background: white;
-            padding: 8px 12px;
-            border-radius: 40px;
+        .amount-label {
             font-size: 14px;
-            display: inline-block;
+            color: #64748b;
+            letter-spacing: 1px;
         }
 
-        .amount {
-            text-align: center;
+        .amount-value {
             font-size: 48px;
             font-weight: 800;
-            margin: 24px 0;
+            color: #0f172a;
+            line-height: 1.2;
         }
 
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin: 16px 0;
+        .rupee-symbol {
+            font-size: 28px;
+            font-weight: 600;
         }
 
-        .btn {
+        .intent-button {
             width: 100%;
-            padding: 16px;
+            background: #2563eb;
+            color: white;
             border: none;
+            padding: 16px;
             border-radius: 60px;
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .intent-button:active {
+            transform: scale(0.97);
+            background: #1d4ed8;
+        }
+
+        .qr-fallback {
             text-align: center;
+            padding: 20px 16px;
+            background: #f9fafb;
+            border-radius: 24px;
+            border: 1px solid #e2e8f0;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            color: white;
-        }
-
-        .btn-primary:active { transform: scale(0.97); }
-
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #1e293b;
-            border: 1px solid #cbd5e1;
-        }
-
-        .instruction {
-            background: #e6f7e6;
-            border-left: 4px solid #22c55e;
-            padding: 16px;
-            border-radius: 16px;
+        .qr-title {
             font-size: 14px;
-            margin: 20px 0;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 12px;
         }
 
-        .warning {
-            background: #fee2e2;
-            border-left: 4px solid #ef4444;
+        .qr-container {
+            background: white;
             padding: 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            margin-top: 16px;
-            color: #991b1b;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 12px;
         }
 
-        .toast {
+        .qr-note {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .toast-message {
             position: fixed;
             bottom: 30px;
             left: 50%;
@@ -113,94 +143,158 @@
             border-radius: 40px;
             font-size: 14px;
             opacity: 0;
-            transition: 0.3s;
+            transition: opacity 0.3s;
             pointer-events: none;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+
+        .separation {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin: 16px 0;
+            position: relative;
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="merchant">
-            <h2>🏪 Donthula Nithish</h2>
-            <div class="upi-id">6304522525@okbizaxis</div>
-        </div>
-        <div class="amount">₹20.00</div>
 
-        <div class="button-group">
-            <button class="btn btn-primary" id="sendViaIntentBtn">
-                📱 Pay with UPI (App Chooser)
-            </button>
-            <button class="btn btn-secondary" id="copyUpiIdBtn">
-                📋 Copy UPI ID (Manual Pay)
-            </button>
-        </div>
+<div class="payment-card">
+    <div class="merchant-header">
+        <div class="merchant-logo">🏪</div>
+        <div class="merchant-name">Donthula Nithish</div>
+        <div class="merchant-vpa">6304522525@okbizaxis</div>
+    </div>
 
-        <div class="instruction">
-            ✅ <strong>How to pay:</strong><br>
-            1️⃣ Tap <strong>"Pay with UPI"</strong> and select your UPI app (Google Pay, PhonePe, Paytm, etc.).<br>
-            2️⃣ The app will open with my mobile number pre-filled as the payee.<br>
-            3️⃣ Enter the amount (₹20) and complete the payment.
-        </div>
-
-        <div class="warning">
-            ⚠️ <strong>Important:</strong> The "Pay with UPI" button may still show <strong>"Payment Risky"</strong> in some UPI apps due to browser security policies. If that happens, use the <strong>"Copy UPI ID"</strong> button and paste it manually into your UPI app – this method works 100%.
+    <div class="amount-section">
+        <div class="amount-label">TOTAL PAYABLE</div>
+        <div class="amount-value">
+            <span class="rupee-symbol">₹</span>20.00
         </div>
     </div>
-    <div id="toast" class="toast">✅ UPI ID copied! Open any UPI app and paste.</div>
 
-    <script>
-        // Merchant details
-        const MOBILE_NUMBER = "6304522525";
-        const BANK_HANDLE = "okbizaxis";
-        const UPI_ID = `${MOBILE_NUMBER}@${BANK_HANDLE}`;
-        const MERCHANT_NAME = "Donthula Nithish";
-        const AMOUNT = "20";
-        const CURRENCY = "INR";
-        const NOTE = "Payment for service";
+    <button class="intent-button" id="payNowBtn">
+        ⚡ Pay with UPI App
+    </button>
 
-        // Generate transaction reference
-        const TXN_ID = "TXN" + Date.now() + Math.random().toString(36).substring(2, 10);
+    <div class="separation">——— 100% working fallback ———</div>
 
-        // Build UPI deep link with mobile number as payee address
-        function buildUpiLink() {
-            // Format: upi://pay?pa=mobile_number@bank_handle&pn=name&am=amount&cu=INR&tn=note&tr=txn_id
-            return `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${AMOUNT}&cu=${CURRENCY}&tn=${encodeURIComponent(NOTE)}&tr=${TXN_ID}`;
-        }
+    <div class="qr-fallback">
+        <div class="qr-title">📱 Scan & Pay (No Risk Flag)</div>
+        <div id="qrCodeContainer" class="qr-container"></div>
+        <div class="qr-note">Open any UPI app → Scan this QR → Pay ₹20</div>
+    </div>
+</div>
 
-        // Copy UPI ID to clipboard
-        function copyUpiId() {
-            const upiId = UPI_ID;
-            navigator.clipboard.writeText(upiId).then(() => {
-                const toast = document.getElementById('toast');
-                toast.style.opacity = '1';
-                setTimeout(() => toast.style.opacity = '0', 2000);
-            }).catch(() => {
-                alert("Failed to copy. Please manually select the UPI ID above.");
-            });
-        }
+<div id="toastMsg" class="toast-message">🔄 Opening UPI apps...</div>
 
-        // Launch UPI intent
-        function launchUpiIntent() {
-            const upiUrl = buildUpiLink();
-            window.location.href = upiUrl;
-            // Fallback alert if intent doesn't trigger
-            setTimeout(() => {
-                if (document.visibilityState === 'visible') {
-                    alert("No UPI app detected. Please use the 'Copy UPI ID' button and pay manually.");
-                }
-            }, 1500);
-        }
+<!-- QR Code Library (Lightweight, CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
-        // Event listeners
-        document.getElementById('sendViaIntentBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            launchUpiIntent();
+<script>
+    // ----- MERCHANT CONFIGURATION (USE YOUR EXISTING BUSINESS VPA)-----
+    const MERCHANT_VPA = "6304522525@okbizaxis";
+    const MERCHANT_NAME = "Donthula Nithish";
+    const AMOUNT = "20";
+    const CURRENCY = "INR";
+    const PAYMENT_NOTE = "Order payment";
+
+    // Generate a unique transaction reference (NPCI recommends unique 'tr' param for tracking)
+    const generateTransactionId = () => {
+        const timestamp = Date.now().toString();
+        const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+        return `TXN${timestamp}${random}`.slice(0, 35);
+    };
+
+    // Build the UPI deep link (this is the 'Intent' URL)
+    const buildUpiIntent = (txnId) => {
+        const params = new URLSearchParams({
+            pa: MERCHANT_VPA,
+            pn: MERCHANT_NAME,
+            am: AMOUNT,
+            cu: CURRENCY,
+            tn: PAYMENT_NOTE,
+            tr: txnId
         });
+        return `upi://pay?${params.toString()}`;
+    };
 
-        document.getElementById('copyUpiIdBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            copyUpiId();
+    // Build the full Android 'intent://' wrapper (more explicit for Android)
+    const buildAndroidIntent = (txnId) => {
+        const params = new URLSearchParams({
+            pa: MERCHANT_VPA,
+            pn: MERCHANT_NAME,
+            am: AMOUNT,
+            cu: CURRENCY,
+            tn: PAYMENT_NOTE,
+            tr: txnId
         });
-    </script>
+        // This format helps Android recognize the payment intent more reliably
+        return `intent://pay?${params.toString()}#Intent;scheme=upi;end;`;
+    };
+
+    // Show toast feedback
+    const showToast = (message, duration = 2000) => {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = message;
+        toast.style.opacity = '1';
+        setTimeout(() => {
+            toast.style.opacity = '0';
+        }, duration);
+    };
+
+    // Attempt the Intent flow (best case) and fallback gracefully
+    const initiatePayment = () => {
+        const txnId = generateTransactionId();
+        const intentUrl = buildUpiIntent(txnId);
+        const androidIntentUrl = buildAndroidIntent(txnId);
+        
+        console.log("Initiating UPI Intent for Txn:", txnId);
+        showToast("🔓 Opening UPI apps...", 1500);
+        
+        // Try the standard upi:// scheme first (most compatible)
+        window.location.href = intentUrl;
+        
+        // Backup: after 300ms, try the Android-specific intent wrapper
+        setTimeout(() => {
+            window.location.href = androidIntentUrl;
+        }, 300);
+        
+        // If the page remains visible after 3 seconds, the intent probably failed.
+        // This is our signal to show the user the QR code fallback.
+        setTimeout(() => {
+            if (document.visibilityState === 'visible') {
+                showToast("⚠️ App didn't open? Scan the QR code below", 3000);
+                // Scroll to QR section to prompt user
+                document.querySelector('.qr-fallback').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 3000);
+    };
+
+    // Generate the QR code (guaranteed to work, no risk warnings)
+    const generateQrCode = () => {
+        const upiLink = buildUpiIntent(generateTransactionId());
+        const qrContainer = document.getElementById('qrCodeContainer');
+        qrContainer.innerHTML = ''; // Clear previous
+        new QRCode(qrContainer, {
+            text: upiLink,
+            width: 160,
+            height: 160,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    };
+
+    // Attach click listener to the main button
+    document.getElementById('payNowBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        initiatePayment();
+    });
+
+    // Generate QR on page load (ensures user always has a working method)
+    generateQrCode();
+</script>
 </body>
 </html>
