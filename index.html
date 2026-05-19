@@ -1,27 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>UPI Pay</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Payment</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .gpay {
+            background: #4285F4;
+            color: white;
+        }
+
+        .phonepe {
+            background: #5F259F;
+            color: white;
+        }
+
+        .paytm {
+            background: #00BAF2;
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
-<button onclick="payNow()">
-    Pay ₹20
-</button>
+<div class="card">
+    <h2>Pay ₹20</h2>
+    <p>Donthula Nithish</p>
+
+    <button class="gpay" onclick="openGPay()">
+        Pay with Google Pay
+    </button>
+
+    <button class="phonepe" onclick="openPhonePe()">
+        Pay with PhonePe
+    </button>
+
+    <button class="paytm" onclick="openPaytm()">
+        Pay with Paytm
+    </button>
+</div>
 
 <script>
-function payNow() {
 
-    const upiUrl =
-        "upi://pay" +
-        "?pa=6304522525@okbizaxis" +
-        "&pn=Donthula%20Nithish" +
-        "&am=20" +
-        "&cu=INR" +
-        "&tn=Payment";
+const upiId = "6304522525@okbizaxis";
+const payeeName = "Donthula Nithish";
+const amount = "20";
+const txnRef = "ORD" + Date.now();
+const note = "Payment";
 
-    window.location.href = upiUrl;
+function openGPay() {
+
+    const url =
+    `tez://upi/pay?pa=${encodeURIComponent(upiId)}
+    &pn=${encodeURIComponent(payeeName)}
+    &am=${amount}
+    &cu=INR
+    &tn=${encodeURIComponent(note)}
+    &tr=${txnRef}`.replace(/\s/g,'');
+
+    window.location.href = url;
 }
+
+function openPhonePe() {
+
+    const url =
+    `phonepe://pay?pa=${encodeURIComponent(upiId)}
+    &pn=${encodeURIComponent(payeeName)}
+    &am=${amount}
+    &cu=INR
+    &tn=${encodeURIComponent(note)}
+    &tr=${txnRef}`.replace(/\s/g,'');
+
+    window.location.href = url;
+}
+
+function openPaytm() {
+
+    const url =
+    `paytmmp://pay?pa=${encodeURIComponent(upiId)}
+    &pn=${encodeURIComponent(payeeName)}
+    &am=${amount}
+    &cu=INR
+    &tn=${encodeURIComponent(note)}
+    &tr=${txnRef}`.replace(/\s/g,'');
+
+    window.location.href = url;
+}
+
 </script>
 
 </body>
